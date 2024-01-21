@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Marked in the browser</title>
+</head>
+<body>
+  <a href="/">Back to ToC</a>
+  <div id="content"></div>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    document.getElementById('content').innerHTML =
+      marked.parse('# Marked in browser\n\nRendered by **marked**.');
+
+ 
+  // Function to fetch file content using the fetch API
+  function fetchMarkdownFile(filePath) {
+      return fetch(filePath)
+          .then(response => response.text())
+          .catch(error => console.error('Error fetching Markdown file:', error));
+  }
+  
+  // Function to render Markdown content using marked.js
+  function renderMarkdown(content) {
+      document.getElementById('content').innerHTML = marked.parse(content);
+  
+      // Add click event listeners to all <a> tags
+      const links = document.querySelectorAll('#content a');
+      links.forEach(link => {
+          link.addEventListener('click', function(event) {
+              event.preventDefault(); // Prevent default link behavior
+              let href = link.getAttribute('href');
+              console.log(decodeHtml(href))
+              fetchMarkdownFile(decodeHtml(href)).then(renderMarkdown);
+          });
+      });
+  }
+
+  function decodeHtml(html) {
+      var doc = new DOMParser().parseFromString(html, 'text/html');
+      return doc.body.textContent;
+  }
+  // Replace 'your-file.md' with the actual path to your Markdown file
+  const filePath = 'document/OWASP_Testing_Guide_v4_Table_of_Contents.md';
+  
+  // Fetch and render the Markdown content
+  fetchMarkdownFile(filePath)
+      .then(renderMarkdown);
+  </script>
+</body>
+</html>
